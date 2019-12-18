@@ -45,5 +45,5 @@ steps:
       if [ $DOCKER_CACHE_HIT != "true" ];
       then
           echo "-------> Saving docker image"
-          time docker image save -o ./.dockercache/containerimage.tar containerimage
+          time docker image save -o ./.dockercache/containerimage.tar containerimage $(docker history -q containerimage)
       fi
