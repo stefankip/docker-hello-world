@@ -24,7 +24,7 @@ variables:
   CACHE_KEY_SALT: 2
   CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
   CACHE_KEY_FALLBACK: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
-  CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK) | $(System.DefaultWorkingDirectory)/Dockerfile,$(System.DefaultWorkingDirectory)/Cargo.*'
+  CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK) | $(System.DefaultWorkingDirectory)/src/Dockerfile'
 
 steps:
 
