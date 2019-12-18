@@ -12,7 +12,7 @@ pool:
 steps:
 - task: Cache@2
   inputs:
-    key: docker-image | src/dockerfile
+    key: docker-image | $(System.DefaultWorkingDirectory)/src/Dockerfile
     path: ".dockercache"
     restoreKeys: docker-image
     cacheHitVar: DOCKER_CACHE_HIT
