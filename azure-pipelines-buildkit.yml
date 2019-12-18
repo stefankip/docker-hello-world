@@ -29,7 +29,7 @@ variables:
 steps:
 
 # Build/restore the BuildKit tool 
-- task: CacheBeta@0
+- task: Cache@2
   inputs:
     key: $(BUILDKIT_CACHE_KEY)
     path: '$(System.DefaultWorkingDirectory)/buildkit'
@@ -49,7 +49,7 @@ steps:
     which buildkitd
 
 # restore the BuildKit cache based on the Dockerfile ...
-- task: CacheBeta@0
+- task: Cache@2
   inputs:
     key: $(CACHE_KEY_EXACT)
     path: '$(BUILD_KIT_CACHE)'
@@ -91,3 +91,4 @@ steps:
 - task: CmdLine@2
   inputs:
     script: 'docker images'
+  displayName: 'docker images'
