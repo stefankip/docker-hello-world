@@ -1,0 +1,49 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Cache@2
+  inputs:
+    key: docker-image | src/dockerfile
+    path: ".dockercache"
+    restoreKeys: docker-image
+    cacheHitVar: DOCKER_CACHE_HIT
+  displayName: Cache docker layers
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      #! /bin/bash
+      
+      set -e 
+      set -x 
+      
+      # Create .dockercache directory
+      mkdir -p ./.dockercache/
+      
+      # Import containerimage from cache to speed up build if there was a version in cache
+      if [ -f ".dockercache/containerimage.tar" ]; 
+      then
+          echo "-------> Restoring docker image"
+          time docker load -i .dockercache/containerimage.tar
+      fi
+      
+      echo "-------> Building containerimage"
+      # Build the docker image using the `docker load`'d image for cache
+      time docker build --cache-from containerimage:latest -t containerimage -f ./src/Dockerfile ./src
+      
+      # If the current cached image is out of date save containerimage so it can be cached
+      if [ $DOCKER_CACHE_HIT != "true" ];
+      then
+          echo "-------> Saving docker image"
+          time docker image save -o ./.dockercache/containerimage.tar containerimage
+      fi
