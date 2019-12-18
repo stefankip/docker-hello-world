@@ -19,8 +19,3 @@ steps:
     repository: my-image
     command: build
     Dockerfile: src/Dockerfile
-
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'buildctl'
