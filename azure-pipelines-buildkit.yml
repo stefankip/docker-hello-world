@@ -90,9 +90,11 @@ steps:
     sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
+- script: docker tag wirelabregistry.azurecr.io/stefankipdockerhelloworld:latest wirelabregistry.azurecr.io/stefankipdockerhelloworld:$(Build.BuildId)
+
 - task: Docker@2
   inputs:
     containerRegistry: 'Wirelab ACR'
     repository: 'stefankipdockerhelloworld'
     command: 'push'
-    tags: 'latest'
+    tags: '$(Build.BuildId)'
