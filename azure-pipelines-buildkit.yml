@@ -73,12 +73,12 @@ steps:
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
       echo "Will use cached layers from $(BUILD_KIT_CACHE)"
       find $(BUILD_KIT_CACHE)
-      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
+      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE) | docker load"
     fi
 
     if [ "$(BuildKitLayersHit)" != "true" ]; then
       echo "Will store cached layers to $(BUILD_KIT_CACHE)"
-      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE)"
+      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE) | docker load"
     fi
 
     sudo $DOCKER_COMMAND
