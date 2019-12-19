@@ -29,9 +29,9 @@ variables:
 
 steps:
 - script: |
-    export DOCKERFILE=$(find . -name 'Dockerfile')
-    export DOCKER_COMMAND=$DOCKER_COMMAND dockerfile=$DOCKERFILE
-    export CACHE_KEY_EXACT=$CACHE_KEY_FALLBACK | $DOCKERFILE
+    export DOCKERFILE="$(find . -name 'Dockerfile')"
+    export DOCKER_COMMAND="$DOCKER_COMMAND dockerfile=$DOCKERFILE"
+    export CACHE_KEY_EXACT="$CACHE_KEY_FALLBACK | $DOCKERFILE"
     env
 
 # Build/restore the BuildKit tool 
