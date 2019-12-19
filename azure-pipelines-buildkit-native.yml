@@ -19,3 +19,6 @@ steps:
     repository: my-image
     command: build
     Dockerfile: src/Dockerfile
+
+- script: |
+    docker buildx build ./src
