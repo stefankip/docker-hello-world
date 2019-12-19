@@ -47,6 +47,7 @@ steps:
     sudo make install
     which buildctl
     which buildkitd
+  displayName: "Install buildkit"
 
 # restore the BuildKit cache based on the Dockerfile ...
 - task: Cache@2
@@ -61,11 +62,12 @@ steps:
 - script: |
     set -e -x
     sudo buildkitd --debug --root /var/lib/buildkit &
-    
+    sleep 5
+
     until sudo buildctl du -v
     do
       echo "Waiting for daemon to load"
-      sleep 1
+      sleep 2
     done
 
     DOCKER_COMMAND="$(DOCKER_COMMAND)"
@@ -73,15 +75,15 @@ steps:
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
       echo "Will use cached layers from $(BUILD_KIT_CACHE)"
       find $(BUILD_KIT_CACHE)
-      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE) | docker load"
+      DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
 
     if [ "$(BuildKitLayersHit)" != "true" ]; then
       echo "Will store cached layers to $(BUILD_KIT_CACHE)"
-      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE) | docker load"
+      DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE)"
     fi
 
-    sudo $DOCKER_COMMAND
+    sudo $DOCKER_COMMAND | docker load
 
     #find $(BUILD_KIT_CACHE)
 
