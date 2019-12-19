@@ -65,12 +65,12 @@ steps:
 - script: |
     set -e -x
     sudo buildkitd --debug --root /var/lib/buildkit &
-    sleep 5
+    sleep 2
 
     until sudo buildctl du -v
     do
       echo "Waiting for daemon to load"
-      sleep 2
+      sleep 1
     done
 
     DOCKER_COMMAND="$(DOCKER_COMMAND)"
