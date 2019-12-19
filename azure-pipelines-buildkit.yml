@@ -24,17 +24,16 @@ variables:
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=./src --output type=docker,name=$(imageName)'
   CACHE_KEY_SALT: 1
   CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
-  CACHE_KEY_FALLBACK: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
+  CACHE_KEY_FALLBACK: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT)'
   CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK)'
 
 steps:
 - script: |
     export DOCKERFILE="$(find . -name 'Dockerfile')"
     export DOCKER_COMMAND="$DOCKER_COMMAND --local dockerfile=$DOCKERFILE"
+    export CACHE_KEY_FALLBACK='$CACHE_KEY_FALLBACK | "$(DOCKER_COMMAND)"'
     export CACHE_KEY_EXACT="$CACHE_KEY_FALLBACK | $DOCKERFILE"
     env | grep 'DOCKERFILE\|DOCKER_COMMAND\|CACHE_KEY_EXACT'
-
-- script: echo $(DOCKERFILE) $(DOCKER_COMMAND) $(CACHE_KEY_EXACT)
 
 # Build/restore the BuildKit tool 
 - task: Cache@2
