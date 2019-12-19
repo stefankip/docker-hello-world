@@ -14,8 +14,11 @@ variables:
 
 steps:
 - script: |
+    export DOCKER_BUILDKIT=1
+    docker build --platform=local -o . git://github.com/docker/buildx
+    mv buildx ~/.docker/cli-plugins/docker-buildx
     find ~/.docker/cli-plugins
-    docker buildx build ./src
+    docker buildx build .
 
 - task: Docker@2
   displayName: Build an image
