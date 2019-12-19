@@ -12,12 +12,13 @@ pool:
 variables:
   skipComponentGovernanceDetection: 'true'
   DOCKER_BUILDKIT: 1
-  system.debug: 'true'
-  agent.diagnostic: 'true'
+  #system.debug: 'true'
+  #agent.diagnostic: 'true'
 
   # buildkit tool itself
   BUILD_KIT_CACHE: '$(Pipeline.Workspace)/buildkitcache'
-  BUILDKIT_COMMIT: 10cef0c6e178bcaca1ad02b041a96b1091f52071
+  #BUILDKIT_COMMIT: 10cef0c6e178bcaca1ad02b041a96b1091f52071
+  BUILDKIT_COMMIT: f7cf4823f71b1a43b9911d4ee11f0eb502b54cc8
   BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
   DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=./src --local dockerfile=./src --output type=docker,name=wirelabregistry.azurecr.io/stefankipdockerhelloworld:latest'
@@ -34,7 +35,8 @@ steps:
     key: $(BUILDKIT_CACHE_KEY)
     path: '$(System.DefaultWorkingDirectory)/buildkit'
     cacheHitVar: 'BuildKitToolHit'
-  displayName: 'cache buildkit tool'
+  displayName: 'Cache BuildKit'
+
 - script: |
     git clone https://github.com/moby/buildkit.git
     cd buildkit
@@ -42,12 +44,13 @@ steps:
     make
   displayName: "Build BuildKit on cache miss"
   condition: and(succeeded(), ne(variables['BuildKitToolHit'], 'true'))
+
 - script: |
     cd buildkit
     sudo make install
     which buildctl
     which buildkitd
-  displayName: "Install buildkit"
+  displayName: "Install BuildKit"
 
 # restore the BuildKit cache based on the Dockerfile ...
 - task: Cache@2
@@ -57,7 +60,7 @@ steps:
     cacheHitVar: 'BuildKitLayersHit'
     restoreKeys: |
       $(CACHE_KEY_FALLBACK)
-  displayName: 'cache docker layers'
+  displayName: 'Cache docker layers'
 
 - script: |
     set -e -x
@@ -88,9 +91,10 @@ steps:
     find $(BUILD_KIT_CACHE)
 
     sudo kill -9 $(jobs -p)
-  displayName: 'docker build'
+  displayName: 'Docker build'
 
 - script: docker tag wirelabregistry.azurecr.io/stefankipdockerhelloworld:latest wirelabregistry.azurecr.io/stefankipdockerhelloworld:$(Build.BuildId)
+  displayName: 'Docker tag'
 
 - task: Docker@2
   inputs:
@@ -98,3 +102,4 @@ steps:
     repository: 'stefankipdockerhelloworld'
     command: 'push'
     tags: '$(Build.BuildId)'
+  displayName: 'Docker push'
