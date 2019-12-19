@@ -33,11 +33,7 @@ steps:
     echo "##vso[task.setvariable variable=DOCKER_COMMAND]$DOCKER_COMMAND --local dockerfile=$DOCKERFILE"
     echo "##vso[task.setvariable variable=CACHE_KEY_FALLBACK]$CACHE_KEY_FALLBACK | \"$(DOCKER_COMMAND)\""
     echo "##vso[task.setvariable variable=CACHE_KEY_EXACT]$CACHE_KEY_FALLBACK | $DOCKERFILE"
-    export DOCKERFILE="$(find . -name 'Dockerfile')"
-    export DOCKER_COMMAND="$DOCKER_COMMAND --local dockerfile=$DOCKERFILE"
-    export CACHE_KEY_FALLBACK="$CACHE_KEY_FALLBACK | \"$(DOCKER_COMMAND)\""
-    export CACHE_KEY_EXACT="$CACHE_KEY_FALLBACK | $DOCKERFILE"
-    env | grep 'DOCKERFILE\|DOCKER_COMMAND\|CACHE_KEY_FALLBACK\|CACHE_KEY_EXACT'
+  displayName: 'Set variables'
 
 # Build/restore the BuildKit tool 
 - task: Cache@2
