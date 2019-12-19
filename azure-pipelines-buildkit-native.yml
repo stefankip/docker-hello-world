@@ -13,12 +13,13 @@ variables:
   DOCKER_BUILDKIT: 1
 
 steps:
+- script: |
+    find ~/.docker/cli-plugins
+    docker buildx build ./src
+
 - task: Docker@2
   displayName: Build an image
   inputs:
     repository: my-image
     command: build
     Dockerfile: src/Dockerfile
-
-- script: |
-    docker buildx build ./src
