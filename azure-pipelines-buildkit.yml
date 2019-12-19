@@ -10,6 +10,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
+  imageName: 'wirelabregistry.azurecr.io/stefankipdockerhelloworld'
   skipComponentGovernanceDetection: 'true'
   DOCKER_BUILDKIT: 1
   #system.debug: 'true'
@@ -17,17 +18,21 @@ variables:
 
   # buildkit tool itself
   BUILD_KIT_CACHE: '$(Pipeline.Workspace)/buildkitcache'
-  #BUILDKIT_COMMIT: 10cef0c6e178bcaca1ad02b041a96b1091f52071
   BUILDKIT_COMMIT: f7cf4823f71b1a43b9911d4ee11f0eb502b54cc8
   BUILDKIT_CACHE_KEY: GOOFS=0 | buildkit | $(BUILDKIT_COMMIT)
 
-  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=./src --local dockerfile=./src --output type=docker,name=wirelabregistry.azurecr.io/stefankipdockerhelloworld:latest'
-  CACHE_KEY_SALT: 2
+  DOCKER_COMMAND: 'buildctl build --frontend=dockerfile.v0 --local context=./src --local --output type=docker,name=$(imageName)'
+  CACHE_KEY_SALT: 1
   CACHE_KEY_BUILDKIT: '"DOCKER_BUILDKIT=$(DOCKER_BUILDKIT)" | "BUILDKIT_COMMIT=$(BUILDKIT_COMMIT)"'
   CACHE_KEY_FALLBACK: '"CACHE_KEY_SALT=$(CACHE_KEY_SALT)" | "$(Agent.OS) $(Agent.JobName)" | $(CACHE_KEY_BUILDKIT) | "$(DOCKER_COMMAND)"'
-  CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK) | $(System.DefaultWorkingDirectory)/src/Dockerfile'
+  CACHE_KEY_EXACT: '$(CACHE_KEY_FALLBACK)'
 
 steps:
+- script: |
+    export DOCKERFILE=$(find . -name 'Dockerfile')
+    export DOCKER_COMMAND=$DOCKER_COMMAND dockerfile=$DOCKERFILE
+    export CACHE_KEY_EXACT=$CACHE_KEY_FALLBACK | $DOCKERFILE
+    env
 
 # Build/restore the BuildKit tool 
 - task: Cache@2
@@ -76,7 +81,7 @@ steps:
     DOCKER_COMMAND="$(DOCKER_COMMAND)"
 
     if [ -d "$(BUILD_KIT_CACHE)" ]; then
-      echo "Will use cached layers from $(BUILD_KIT_CACHE)"
+      echo "Using cached layers from $(BUILD_KIT_CACHE)"
       find $(BUILD_KIT_CACHE)
       DOCKER_COMMAND="$DOCKER_COMMAND --import-cache type=local,src=$(BUILD_KIT_CACHE)"
     fi
@@ -93,7 +98,7 @@ steps:
     sudo kill -9 $(jobs -p)
   displayName: 'Docker build'
 
-- script: docker tag wirelabregistry.azurecr.io/stefankipdockerhelloworld:latest wirelabregistry.azurecr.io/stefankipdockerhelloworld:$(Build.BuildId)
+- script: docker tag $(imageName) $(imageName):$(Build.BuildId)
   displayName: 'Docker tag'
 
 - task: Docker@2
