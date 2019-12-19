@@ -9,15 +9,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  DOCKER_BUILDKIT: 1
-
-steps:
-- script: |
-    export DOCKER_BUILDKIT=1
-    docker build --platform=local -o . git://github.com/docker/buildx
-    ./buildx build ./src -o type=image,name=your-image --cache-to=type=local,dest=./docker-cache
-
 - task: Docker@2
   displayName: Build an image
   inputs:
