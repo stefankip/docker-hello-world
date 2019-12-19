@@ -83,9 +83,9 @@ steps:
 
     sudo $DOCKER_COMMAND
 
-    find $(BUILD_KIT_CACHE)
+    #find $(BUILD_KIT_CACHE)
 
-    sudo kill -9 $(jobs -p)
+    #sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
 - task: CmdLine@2
