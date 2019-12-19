@@ -85,12 +85,14 @@ steps:
 
     sudo $DOCKER_COMMAND | docker load
 
-    #find $(BUILD_KIT_CACHE)
+    find $(BUILD_KIT_CACHE)
 
-    #sudo kill -9 $(jobs -p)
+    sudo kill -9 $(jobs -p)
   displayName: 'docker build'
 
-- task: CmdLine@2
+- task: Docker@2
   inputs:
-    script: 'docker images'
-  displayName: 'docker images'
+    containerRegistry: 'Wirelab ACR'
+    repository: 'stefankipdockerhelloworld'
+    command: 'push'
+    tags: 'latest'
